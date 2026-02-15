@@ -18,8 +18,8 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "node --test ../../tests/sdk/*.test.js",
-    "lint": "standard src/"
+    "test": "node --import tsx --test ../../tests/sdk/*.test.ts",
+    "lint": "tsc --noEmit"
   },
   "devDependencies": {
     "standard": "^17.1.0",

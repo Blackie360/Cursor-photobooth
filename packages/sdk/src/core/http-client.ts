@@ -1,7 +1,22 @@
 import { PayheroApiError, PayheroTransportError, PayheroValidationError } from './errors.js'
 import { withRetry } from './retry.js'
+import type {
+  HttpClientConfig,
+  JsonObject,
+  JsonValue
+} from '../types.js'
 
-export function createHttpClient (config = {}) {
+interface HttpRequestOptions {
+  body?: JsonObject
+  query?: Record<string, string | number | boolean>
+}
+
+interface HttpClient {
+  get: (path: string, options?: HttpRequestOptions) => Promise<JsonValue>
+  post: (path: string, options?: HttpRequestOptions) => Promise<JsonValue>
+}
+
+export function createHttpClient (config: Partial<HttpClientConfig> = {}): HttpClient {
   const {
     baseUrl = 'https://backend.payhero.co.ke/api/v2',
     authToken,
@@ -10,23 +25,27 @@ export function createHttpClient (config = {}) {
     fetchImpl = globalThis.fetch
   } = config
 
-  if (!authToken) {
+  if (!authToken || typeof authToken !== 'string') {
     throw new PayheroValidationError('Missing auth token')
   }
+  const token: string = authToken
 
   if (typeof fetchImpl !== 'function') {
     throw new PayheroValidationError('Missing fetch implementation')
   }
 
-  async function request (method, path, options = {}) {
+  async function request (
+    method: 'GET' | 'POST',
+    path: string,
+    options: HttpRequestOptions = {}
+  ): Promise<JsonValue> {
     const { body, query } = options
-    return withRetry(async () => {
+    return withRetry<JsonValue>(async () => {
       const url = new URL(normalizePath(baseUrl, path))
       if (query) {
         for (const [key, value] of Object.entries(query)) {
-          if (value === undefined || value === null || value === '') {
-            continue
-          }
+          if (value === null || value === '') continue
+          if (typeof value === 'undefined') continue
           url.searchParams.set(key, String(value))
         }
       }
@@ -38,12 +57,12 @@ export function createHttpClient (config = {}) {
         const response = await fetchImpl(url, {
           method,
           headers: {
-            authorization: normalizeAuthToken(authToken),
+            authorization: normalizeAuthToken(token),
             'content-type': 'application/json'
           },
           body: body ? JSON.stringify(body) : undefined,
           signal: controller.signal
-        })
+        } as RequestInit)
 
         const payload = await parsePayload(response)
 
@@ -57,12 +76,12 @@ export function createHttpClient (config = {}) {
 
         return payload
       } catch (error) {
-        if (error.name === 'PayheroApiError') {
+        if (error instanceof PayheroApiError) {
           throw error
         }
-
+        const err = error instanceof Error ? error : new Error(String(error))
         throw new PayheroTransportError('Network request failed', {
-          cause: error,
+          cause: err,
           isRetryable: true
         })
       } finally {
@@ -72,28 +91,31 @@ export function createHttpClient (config = {}) {
   }
 
   return {
-    get: (path, options) => request('GET', path, options),
-    post: (path, options) => request('POST', path, options)
+    get: (path: string, options?: HttpRequestOptions) =>
+      request('GET', path, options),
+    post: (path: string, options?: HttpRequestOptions) =>
+      request('POST', path, options)
   }
 }
 
-function normalizePath (baseUrl, path) {
+function normalizePath (baseUrl: string, path: string): string {
   const base = baseUrl.replace(/\/$/, '')
   const nextPath = path.startsWith('/') ? path : `/${path}`
   return `${base}${nextPath}`
 }
 
-function normalizeAuthToken (authToken) {
+function normalizeAuthToken (authToken: string): string {
   if (authToken.startsWith('Basic ')) {
     return authToken
   }
   return `Basic ${authToken}`
 }
 
-async function parsePayload (response) {
-  const contentType = response.headers.get('content-type') || ''
+async function parsePayload (response: Response): Promise<JsonValue> {
+  const contentType = response.headers.get('content-type') ?? ''
   if (contentType.includes('application/json')) {
-    return response.json()
+    const data = await response.json()
+    return data as JsonValue
   }
   return response.text()
 }

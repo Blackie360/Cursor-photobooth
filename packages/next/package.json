@@ -21,11 +21,13 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "node --test ../../tests/next/*.test.js",
-    "lint": "standard src/"
+    "test": "node --import tsx --test ../../tests/next/*.test.ts",
+    "lint": "tsc --noEmit"
   },
   "devDependencies": {
+    "@types/node": "^22.10.1",
     "standard": "^17.1.0",
-    "tsup": "^8.3.5"
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2"
   }
 }

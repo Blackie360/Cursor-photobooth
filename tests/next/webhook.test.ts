@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { parsePayheroCallbackBody } from '../../packages/next/src/index.js'
+import { parsePayheroCallbackBody } from '../../packages/next/dist/index.js'
 
 test('parsePayheroCallbackBody maps callback shape', () => {
   const data = parsePayheroCallbackBody({

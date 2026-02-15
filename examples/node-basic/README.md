@@ -10,8 +10,12 @@ pnpm add @payhero/sdk
 
 ## Run
 
+After building the monorepo (`pnpm build` from root):
+
 ```bash
-PAYHERO_AUTH_TOKEN=your-token node index.js
+PAYHERO_AUTH_TOKEN=your-token node --import tsx index.ts
 ```
+
+Or compile and run: `tsc` then `node index.js`
 
 Or set `PAYHERO_BASE_URL` if using a custom API base.

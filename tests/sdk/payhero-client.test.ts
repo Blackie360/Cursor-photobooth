@@ -1,16 +1,15 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { createPayheroClient } from '../../packages/sdk/src/index.js'
+import { createPayheroClient } from '../../packages/sdk/dist/index.js'
 
 test('getTransactionStatus builds request correctly', async () => {
-  const calls = []
-  const fetchImpl = async (url) => {
+  const calls: string[] = []
+  const fetchImpl: typeof fetch = async (url) => {
     calls.push(String(url))
-    return {
-      ok: true,
-      headers: { get: () => 'application/json' },
-      json: async () => ({ success: true })
-    }
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' }
+    })
   }
 
   const client = createPayheroClient({

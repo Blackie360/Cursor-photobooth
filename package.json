@@ -1,0 +1,12 @@
+{
+  "name": "payhero-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "PayHero Kenya monorepo with SDK and Next.js adapter",
+  "packageManager": "pnpm@10.28.2",
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm -r --if-present lint"
+  }
+}

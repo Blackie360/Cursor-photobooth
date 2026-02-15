@@ -2,14 +2,30 @@
   "name": "@payhero/next",
   "version": "0.1.0",
   "type": "module",
-  "main": "src/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
   },
   "dependencies": {
     "@payhero/sdk": "workspace:*"
   },
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "node --test ../../tests/next/*.test.js",
+    "lint": "standard src/"
+  },
+  "devDependencies": {
+    "standard": "^17.1.0",
+    "tsup": "^8.3.5"
   }
 }

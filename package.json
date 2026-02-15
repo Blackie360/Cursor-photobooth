@@ -8,5 +8,10 @@
     "build": "pnpm -r --if-present build",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r --if-present lint"
+  },
+  "devDependencies": {
+    "standard": "^17.1.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
   }
 }

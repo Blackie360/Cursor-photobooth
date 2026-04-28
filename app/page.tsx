@@ -28,6 +28,17 @@ function parseHashtags(input: string) {
     .map((value) => (value.startsWith('#') ? value : `#${value}`))
 }
 
+function buildFileName(title: string) {
+  const slug = title
+    .replace(/^[\s/#]+/, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  return `${slug || 'card'}.png`
+}
+
 export default function Home() {
   const [hasMounted, setHasMounted] = useState(false)
   const [image, setImage] = useState<string | null>(null)
@@ -93,7 +104,7 @@ export default function Home() {
 
     if (!blob) return null
 
-    return new File([blob], 'cursor-nairobi-meetup-card.png', { type: 'image/png' })
+    return new File([blob], buildFileName(title), { type: 'image/png' })
   }
 
   const handleDownload = () => {
@@ -102,7 +113,7 @@ export default function Home() {
       setShareMessage('')
       const link = document.createElement('a')
       link.href = canvas.toDataURL('image/png')
-      link.download = 'cursor-nairobi-meetup-card.png'
+      link.download = buildFileName(title)
       link.click()
     }
   }
@@ -121,10 +132,11 @@ export default function Home() {
     try {
       setIsSharing(true)
       setShareMessage('')
+      const cardLabel = title.replace(/^[\s/#]+/, '').trim() || 'Card'
       await navigator.share({
         files: [file],
-        title: 'Cursor Nairobi Meetup card',
-        text: 'My Cursor Nairobi Meetup card',
+        title: `${cardLabel} card`,
+        text: `My ${cardLabel} card`,
       })
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') {
@@ -155,8 +167,9 @@ export default function Home() {
     }
 
     try {
+      const cardLabel = title.replace(/^[\s/#]+/, '').trim() || 'Card'
       await navigator.share({
-        title: title || 'Cursor Nairobi Meetup card',
+        title: `${cardLabel} card`,
         url,
       })
       setShareMessage('')

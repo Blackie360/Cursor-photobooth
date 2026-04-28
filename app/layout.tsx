@@ -3,11 +3,18 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const geistSans = Geist({
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
+})
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
+})
 
 const siteTitle = 'Cursor Nairobi Meetup Card'
-const siteDescription = 'Generate the Cursor Nairobi Meetup social card from the provided Figma reference.'
+const siteDescription =
+  'Generate the Cursor Nairobi Meetup social card from the provided Figma reference.'
 const ogImage = {
   url: '/cursor-community-avatar.svg',
   width: 1200,
@@ -50,8 +57,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-slate-950">
-      <body className="font-sans antialiased bg-slate-950">
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark`}>
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+        <a
+          href="#main-content"
+          className="sr-only left-4 top-4 z-50 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus:not-sr-only focus:fixed"
+        >
+          Skip to Main Content
+        </a>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

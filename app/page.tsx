@@ -251,171 +251,207 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(84,84,84,0.12),transparent_34%),#050505] text-white">
-      <div className="mx-auto grid max-w-6xl gap-6 px-6 py-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-10">
-        <section className="rounded-[32px] border border-white/10 bg-white/[0.03] p-4 shadow-[0_40px_120px_rgba(0,0,0,0.35)] backdrop-blur sm:p-6">
-          <CardPreview image={image} title={title} hashtags={hashtags} canvasRef={canvasRef} />
-        </section>
+    <main id="main-content" className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(60rem_30rem_at_50%_-20%,rgba(255,111,74,0.08),transparent_70%)]"
+      />
 
-        <section className="space-y-5 rounded-[32px] border border-white/10 bg-white/[0.03] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
-          <div className="space-y-2">
-            <p className="text-sm text-white/60">Upload a photo, then download or share it.</p>
-          </div>
+      <div className="relative mx-auto flex max-w-7xl flex-col gap-8 px-6 py-6 sm:px-8 lg:px-10 lg:py-10">
+        <div
+          id="workspace"
+          className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]"
+        >
+          <section
+            aria-label="Community card preview"
+            className="rounded-[32px] border border-border bg-card/75 p-4 shadow-[0_40px_120px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:p-6"
+          >
+            <CardPreview
+              image={image}
+              title={title}
+              hashtags={hashtags}
+              canvasRef={canvasRef}
+            />
+          </section>
 
-          <CardEditor setImage={handleImageChange} hasImage={Boolean(image)} />
-
-          {hasMounted && !isLockedView ? (
-            <section className="space-y-4 border-t border-white/10 pt-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <h2 className="text-sm font-medium text-white/88">Card Settings</h2>
-                  <p className="text-sm text-white/50">Edit the title and hashtags, then share the locked link.</p>
-                </div>
-                <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/55">
-                  Admin
-                </span>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm text-white/70" htmlFor="card-title">
-                  Title
-                </label>
-                <Input
-                  id="card-title"
-                  name="card_title"
-                  autoComplete="off"
-                  spellCheck={false}
-                  value={title}
-                  onChange={(event) => {
-                    setTitle(event.target.value)
-                    setShareMessage('')
-                  }}
-                  className="h-10 rounded-2xl border-white/10 bg-white/[0.02] text-white shadow-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm text-white/70" htmlFor="card-tags">
-                  Hashtags
-                </label>
-                <Textarea
-                  id="card-tags"
-                  name="card_hashtags"
-                  autoComplete="off"
-                  spellCheck={false}
-                  value={hashtagsText}
-                  onChange={(event) => {
-                    setHashtagsText(event.target.value)
-                    setShareMessage('')
-                  }}
-                  className="min-h-24 rounded-2xl border-white/10 bg-white/[0.02] text-white shadow-none"
-                />
-              </div>
-
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Button
-                  onClick={handleCopyLink}
-                  variant="outline"
-                  className="h-10 w-full rounded-2xl border-white/10 bg-transparent px-3 text-white hover:bg-white/[0.05] hover:text-white"
-                >
-                  <Copy className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span className="truncate">Copy Locked Link</span>
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="h-10 w-full rounded-2xl border-white/10 bg-transparent px-3 text-white hover:bg-white/[0.05] hover:text-white"
-                    >
-                      <Link2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      <span className="truncate">Share Locked Link</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-56 rounded-2xl border-white/10 bg-[#0b0b0b] text-white"
-                  >
-                    <DropdownMenuLabel className="text-white/60">
-                      Share to
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-white/10" />
-                    <DropdownMenuItem
-                      onSelect={handleShareToTwitter}
-                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
-                    >
-                      <Twitter className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      X (Twitter)
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={handleShareToLinkedIn}
-                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
-                    >
-                      <Linkedin className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      LinkedIn
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={handleShareToWhatsApp}
-                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
-                    >
-                      <MessageCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      WhatsApp
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={handleShareToTelegram}
-                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
-                    >
-                      <Send className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      Telegram
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-white/10" />
-                    <DropdownMenuItem
-                      onSelect={handleNativeShareLink}
-                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
-                    >
-                      <Share2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      More…
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </section>
-          ) : null}
-
-          <div className="space-y-3">
-            <Button
-              onClick={handleDownload}
-              disabled={!image}
-              className="h-[52px] w-full rounded-full bg-white text-base font-semibold text-black hover:bg-white/90"
-            >
-              <Download className="h-4 w-4 shrink-0" aria-hidden="true" />
-              Download
-            </Button>
-            <Button
-              onClick={handleShare}
-              disabled={!image || isSharing}
-              variant="outline"
-              className="h-[52px] w-full rounded-full border-white/15 bg-transparent text-base font-semibold text-white hover:bg-white/[0.06] hover:text-white"
-            >
-              <Share2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-              {isSharing ? 'Sharing…' : 'Share image'}
-            </Button>
-            {image ? (
-              <Button
-                onClick={handleReset}
-                variant="ghost"
-                className="h-11 w-full rounded-full text-white/70 hover:bg-white/[0.05] hover:text-white"
+          <section
+            aria-labelledby="editor-title"
+            className="space-y-5 rounded-[32px] border border-border bg-card/75 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl"
+          >
+            <div className="space-y-2">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--brand-peach)]">
+                Editor
+              </p>
+              <h2
+                id="editor-title"
+                className="text-xl font-semibold tracking-[-0.02em] text-foreground"
               >
-                Clear photo
-              </Button>
-            ) : null}
-          </div>
+                Build Your Post
+              </h2>
+              <p className="text-sm leading-6 text-muted-foreground">
+                Upload a photo, tune the copy, and publish a locked share link
+                or a ready-to-post image.
+              </p>
+            </div>
 
-          {shareMessage ? (
-            <p aria-live="polite" className="text-sm text-white/55">
-              {shareMessage}
-            </p>
-          ) : null}
-        </section>
+            <CardEditor setImage={handleImageChange} hasImage={Boolean(image)} />
+
+            {hasMounted && !isLockedView ? (
+              <section
+                aria-labelledby="settings-title"
+                className="space-y-4 border-t border-border pt-5"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <h3
+                      id="settings-title"
+                      className="text-sm font-medium text-foreground"
+                    >
+                      Card Settings
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Edit the title and hashtags, then share the locked link.
+                    </p>
+                  </div>
+                  <span className="rounded-full border border-border bg-background/70 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                    Admin
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm text-muted-foreground" htmlFor="card-title">
+                    Title
+                  </label>
+                  <Input
+                    id="card-title"
+                    name="card_title"
+                    autoComplete="off"
+                    spellCheck={false}
+                    placeholder="e.g. /Nairobi Meetup…"
+                    value={title}
+                    onChange={(event) => {
+                      setTitle(event.target.value)
+                      setShareMessage('')
+                    }}
+                    className="h-11 rounded-2xl border-input bg-background/70 text-foreground shadow-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm text-muted-foreground" htmlFor="card-tags">
+                    Hashtags
+                  </label>
+                  <Textarea
+                    id="card-tags"
+                    name="card_hashtags"
+                    autoComplete="off"
+                    spellCheck={false}
+                    placeholder={'#CursorAINairobi\n#BuildInPublic…'}
+                    value={hashtagsText}
+                    onChange={(event) => {
+                      setHashtagsText(event.target.value)
+                      setShareMessage('')
+                    }}
+                    className="min-h-28 rounded-2xl border-input bg-background/70 text-foreground shadow-none"
+                  />
+                </div>
+
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <Button
+                    onClick={handleCopyLink}
+                    variant="outline"
+                    className="h-11 w-full rounded-2xl border-border bg-background/60 px-3 text-foreground hover:bg-accent hover:text-foreground"
+                  >
+                    <Copy className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span className="truncate">Copy Locked Link</span>
+                  </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="h-11 w-full rounded-2xl border-border bg-background/60 px-3 text-foreground hover:bg-accent hover:text-foreground"
+                      >
+                        <Link2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        <span className="truncate">Share Locked Link</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-56 rounded-2xl border-border bg-popover/95 text-popover-foreground shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl"
+                    >
+                      <DropdownMenuLabel className="text-muted-foreground">
+                        Share To
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onSelect={handleShareToTwitter}>
+                        <Twitter className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        X (Twitter)
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={handleShareToLinkedIn}>
+                        <Linkedin className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        LinkedIn
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={handleShareToWhatsApp}>
+                        <MessageCircle
+                          className="h-4 w-4 shrink-0"
+                          aria-hidden="true"
+                        />
+                        WhatsApp
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={handleShareToTelegram}>
+                        <Send className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        Telegram
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onSelect={handleNativeShareLink}>
+                        <Share2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        More…
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </section>
+            ) : null}
+
+            <div className="space-y-3">
+              <Button
+                onClick={handleDownload}
+                disabled={!image}
+                className="h-[52px] w-full rounded-full bg-primary text-base font-semibold text-primary-foreground hover:bg-primary/92"
+              >
+                <Download className="h-4 w-4 shrink-0" aria-hidden="true" />
+                Download Card
+              </Button>
+
+              <Button
+                onClick={handleShare}
+                disabled={!image || isSharing}
+                variant="outline"
+                className="h-[52px] w-full rounded-full border-border bg-background/60 text-base font-semibold text-foreground hover:bg-accent hover:text-foreground"
+              >
+                <Share2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+                {isSharing ? 'Sharing…' : 'Share Card'}
+              </Button>
+
+              {image ? (
+                <Button
+                  onClick={handleReset}
+                  variant="ghost"
+                  className="h-11 w-full rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  Clear Photo
+                </Button>
+              ) : null}
+            </div>
+
+            {shareMessage ? (
+              <p aria-live="polite" className="text-sm text-muted-foreground">
+                {shareMessage}
+              </p>
+            ) : null}
+          </section>
+        </div>
       </div>
     </main>
   )

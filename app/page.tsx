@@ -6,7 +6,24 @@ import { CardEditor } from '@/components/card-editor'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Copy, Download, Link2, Share2 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Copy,
+  Download,
+  Linkedin,
+  Link2,
+  MessageCircle,
+  Send,
+  Share2,
+  Twitter,
+} from 'lucide-react'
 
 const DEFAULT_TITLE = '/Nairobi Meetup'
 const DEFAULT_HASHTAGS = [
@@ -158,11 +175,56 @@ export default function Home() {
     }
   }
 
-  const handleShareLink = async () => {
+  const buildShareText = () => {
+    const cardLabel = title.replace(/^[\s/#]+/, '').trim() || 'Card'
+    const tagLine = hashtags.length > 0 ? `\n\n${hashtags.join(' ')}` : ''
+    return `Check out my ${cardLabel} card!${tagLine}`
+  }
+
+  const openShareWindow = (shareUrl: string) => {
+    window.open(shareUrl, '_blank', 'noopener,noreferrer,width=640,height=640')
+  }
+
+  const handleShareToTwitter = () => {
+    const url = buildCustomLink()
+    const text = buildShareText()
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      text,
+    )}&url=${encodeURIComponent(url)}`
+    openShareWindow(shareUrl)
+    setShareMessage('Opened X (Twitter) share window.')
+  }
+
+  const handleShareToLinkedIn = () => {
+    const url = buildCustomLink()
+    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
+    openShareWindow(shareUrl)
+    setShareMessage('Opened LinkedIn share window.')
+  }
+
+  const handleShareToWhatsApp = () => {
+    const url = buildCustomLink()
+    const text = `${buildShareText()}\n${url}`
+    const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`
+    openShareWindow(shareUrl)
+    setShareMessage('Opened WhatsApp share window.')
+  }
+
+  const handleShareToTelegram = () => {
+    const url = buildCustomLink()
+    const text = buildShareText()
+    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(
+      url,
+    )}&text=${encodeURIComponent(text)}`
+    openShareWindow(shareUrl)
+    setShareMessage('Opened Telegram share window.')
+  }
+
+  const handleNativeShareLink = async () => {
     const url = buildCustomLink()
 
     if (!navigator.share) {
-      setShareMessage('Link sharing is not supported here. Copy the link instead.')
+      setShareMessage('Native sharing is not supported here. Pick a network above.')
       return
     }
 
@@ -170,6 +232,7 @@ export default function Home() {
       const cardLabel = title.replace(/^[\s/#]+/, '').trim() || 'Card'
       await navigator.share({
         title: `${cardLabel} card`,
+        text: buildShareText(),
         url,
       })
       setShareMessage('')
@@ -178,7 +241,7 @@ export default function Home() {
         return
       }
 
-      setShareMessage('Link sharing failed. Copy the locked link instead.')
+      setShareMessage('Native share failed. Pick a network above instead.')
     }
   }
 
@@ -253,19 +316,67 @@ export default function Home() {
                 <Button
                   onClick={handleCopyLink}
                   variant="outline"
-                  className="h-10 rounded-2xl border-white/10 bg-transparent text-white hover:bg-white/[0.05] hover:text-white"
+                  className="h-10 w-full rounded-2xl border-white/10 bg-transparent px-3 text-white hover:bg-white/[0.05] hover:text-white"
                 >
-                  <Copy className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Copy Locked Link
+                  <Copy className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span className="truncate">Copy Locked Link</span>
                 </Button>
-                <Button
-                  onClick={handleShareLink}
-                  variant="outline"
-                  className="h-10 rounded-2xl border-white/10 bg-transparent text-white hover:bg-white/[0.05] hover:text-white"
-                >
-                  <Link2 className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Share Locked Link
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="h-10 w-full rounded-2xl border-white/10 bg-transparent px-3 text-white hover:bg-white/[0.05] hover:text-white"
+                    >
+                      <Link2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      <span className="truncate">Share Locked Link</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-56 rounded-2xl border-white/10 bg-[#0b0b0b] text-white"
+                  >
+                    <DropdownMenuLabel className="text-white/60">
+                      Share to
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-white/10" />
+                    <DropdownMenuItem
+                      onSelect={handleShareToTwitter}
+                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
+                    >
+                      <Twitter className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      X (Twitter)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={handleShareToLinkedIn}
+                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
+                    >
+                      <Linkedin className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      LinkedIn
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={handleShareToWhatsApp}
+                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
+                    >
+                      <MessageCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      WhatsApp
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={handleShareToTelegram}
+                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
+                    >
+                      <Send className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      Telegram
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-white/10" />
+                    <DropdownMenuItem
+                      onSelect={handleNativeShareLink}
+                      className="cursor-pointer focus:bg-white/[0.06] focus:text-white"
+                    >
+                      <Share2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      More…
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </section>
           ) : null}
@@ -276,7 +387,7 @@ export default function Home() {
               disabled={!image}
               className="h-[52px] w-full rounded-full bg-white text-base font-semibold text-black hover:bg-white/90"
             >
-              <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+              <Download className="h-4 w-4 shrink-0" aria-hidden="true" />
               Download
             </Button>
             <Button
@@ -285,7 +396,7 @@ export default function Home() {
               variant="outline"
               className="h-[52px] w-full rounded-full border-white/15 bg-transparent text-base font-semibold text-white hover:bg-white/[0.06] hover:text-white"
             >
-              <Share2 className="mr-2 h-4 w-4" aria-hidden="true" />
+              <Share2 className="h-4 w-4 shrink-0" aria-hidden="true" />
               {isSharing ? 'Sharing…' : 'Share image'}
             </Button>
             {image ? (
